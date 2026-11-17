@@ -1,3 +1,9 @@
+package app;
+
+import audit.AuditLogger;
+import model.StudentAccount;
+import repository.AccountRepository;
+
 public class Main {
     public static void main(String[] args) {
 
