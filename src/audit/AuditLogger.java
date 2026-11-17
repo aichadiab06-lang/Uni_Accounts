@@ -1,29 +1,37 @@
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+package audit;
+
 import java.util.ArrayList;
 import java.util.List;
 
-/** Singleton : UN SEUL journal d'audit pour tout le programme. */
+/**
+ * Pattern SINGLETON : une seule instance de AuditLogger dans tout le programme.
+ * Role : Singleton (constructeur prive + getInstance()).
+ */
 public class AuditLogger {
 
+    private static AuditLogger instance;          // l'unique instance
     private final List<String> entries = new ArrayList<>();
 
-    private AuditLogger() { }   // constructeur prive
+    private AuditLogger() { }                     // interdit new AuditLogger() depuis l'exterieur
 
-    // Holder idiom : thread-safe + chargement paresseux (lazy)
-    private static class Holder {
-        private static final AuditLogger INSTANCE = new AuditLogger();
+    public static synchronized AuditLogger getInstance() {
+        if (instance == null) {
+            instance = new AuditLogger();
+        }
+        return instance;
     }
 
-    public static AuditLogger getInstance() { return Holder.INSTANCE; }
-
-    public synchronized void log(String action) {
-        String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        entries.add("[" + time + "] " + action);
+    public void log(String message) {
+        entries.add(message);
     }
 
-    public synchronized void printAll() {
-        System.out.println("===== AUDIT LOG =====");
-        for (String e : entries) System.out.println(e);
+    public void printAll() {
+        System.out.println("--- Journal d'audit ---");
+        if (entries.isEmpty()) {
+            System.out.println("(vide)");
+        }
+        for (int i = 0; i < entries.size(); i++) {
+            System.out.println((i + 1) + ". " + entries.get(i));
+        }
     }
 }
