@@ -1,39 +1,45 @@
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+package repository;
 
-/** Singleton : UN SEUL depot qui contient tous les comptes. */
+import audit.AuditLogger;
+import model.StudentAccount;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Pattern SINGLETON : un seul depot central pour tous les comptes.
+ * Role : Singleton (constructeur prive + getInstance()).
+ */
 public class AccountRepository {
 
-    private final Map<String, StudentAccount> accounts = new LinkedHashMap<>();
-    private final AuditLogger logger = AuditLogger.getInstance();
+    private static AccountRepository instance;    // l'unique instance
+    private final List<StudentAccount> accounts = new ArrayList<>();
 
     private AccountRepository() { }
 
-    private static class Holder {
-        private static final AccountRepository INSTANCE = new AccountRepository();
-    }
-
-    public static AccountRepository getInstance() { return Holder.INSTANCE; }
-
-    public synchronized void add(StudentAccount acc) {
-        if (accounts.containsKey(acc.getId())) {
-            logger.log("ECHEC ajout : id deja existant " + acc.getId());
-            throw new IllegalArgumentException("id deja existant : " + acc.getId());
+    public static synchronized AccountRepository getInstance() {
+        if (instance == null) {
+            instance = new AccountRepository();
         }
-        accounts.put(acc.getId(), acc);
-        logger.log("AJOUT compte " + acc.getId() + " (" + acc.getFullName() + ")");
+        return instance;
     }
 
-    public synchronized StudentAccount findById(String id) {
-        logger.log("RECHERCHE compte " + id);
-        return accounts.get(id);
+    // Ajoute un compte ; refuse un id deja present (id unique dans le depot)
+    public void add(StudentAccount account) {
+        for (StudentAccount a : accounts) {
+            if (a.getId().equals(account.getId())) {
+                throw new IllegalArgumentException("Id deja existant : " + account.getId());
+            }
+        }
+        accounts.add(account);
+        AuditLogger.getInstance().log("Compte ajoute : " + account.getId() + " (" + account.getFullName() + ")");
     }
 
-    public synchronized int count() { return accounts.size(); }
+    public int count() {
+        return accounts.size();
+    }
 
-    public synchronized List<StudentAccount> findAll() {
-        return new ArrayList<>(accounts.values());
+    public List<StudentAccount> findAll() {
+        return new ArrayList<>(accounts);
     }
 }
