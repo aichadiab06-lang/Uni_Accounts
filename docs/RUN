@@ -1,0 +1,6 @@
+
+## Without installing Java
+Use GitHub Codespaces: **Code -> Codespaces -> Create codespace on main**, open a Terminal and run the commands above.
+
+## Expected output
+See `screenshot_run.png`: Singleton check, Builder (minimal / full / invalid email), Prototype (copies of a template), duplicate id test, account count and audit log.
